@@ -64,6 +64,20 @@ public class IconListPreference extends ListPreference {
 	}
 
 	@Override
+	public CharSequence getEntry() {
+		if (selectedEntry != -1)
+			return entries[selectedEntry];
+		return super.getEntry().toString();
+	}
+	
+	@Override
+	public String getValue() {
+		if (selectedEntry != -1)
+			return entryValues[selectedEntry].toString();
+		return super.getValue();
+	}
+	
+	@Override
 	public void onBindView(View view) {
 		super.onBindView(view);
 		ImageView imageView = (ImageView) view.findViewById(R.id.icon);
