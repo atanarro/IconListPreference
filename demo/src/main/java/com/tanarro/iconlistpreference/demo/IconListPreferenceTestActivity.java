@@ -1,5 +1,6 @@
-package com.tanarro.iconlistpreference;
+package com.tanarro.iconlistpreference.demo;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -7,11 +8,14 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
+import com.tanarro.iconlistpreference.IconListPreference;
+
 public class IconListPreferenceTestActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
     /** Called when the activity is first created. */
 
     IconListPreference test3, test4;
 
+    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

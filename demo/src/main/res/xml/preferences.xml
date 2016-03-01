@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:iconlistpreference="http://schemas.android.com/apk/res/com.tanarro.iconlistpreference"
-     >
+    xmlns:iconlistpreference="http://schemas.android.com/apk/lib/com.tanarro.iconlistpreference" >
     <ListPreference
         android:key="test1"
         android:title="Test1"
@@ -14,11 +13,11 @@
         android:entries="@array/android_versions"
         android:entryValues="@array/android_version_values"
         android:summary="IconListPreference by xml"
-        iconlistpreference:icon="@drawable/ic_launcher"
+        iconlistpreference:prefIcon="@drawable/ic_launcher"
         iconlistpreference:entryIcons="@array/android_version_icons"
         /><!--
         android:entryIcons="@array/android_version_values"
-        icon="@drawable/ic_launcher"       
+        icon="@drawable/ic_launcher"
          -->
     <com.tanarro.iconlistpreference.IconListPreference
         android:title="Test3"

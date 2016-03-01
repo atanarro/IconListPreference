@@ -1,5 +1,6 @@
 package com.tanarro.iconlistpreference;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
@@ -42,15 +43,16 @@ public class IconListPreference extends ListPreference {
         this(context, attrs, 0);
     }
 
+    @SuppressLint("CommitPrefEdits")
     public IconListPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs);
         setLayoutResource(R.layout.preference_icon);
         mContext = context;
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.IconPreference, defStyle, 0);
-        mIcon = a.getDrawable(R.styleable.IconPreference_icon);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.IconListPreference, defStyle, 0);
+        mIcon = a.getDrawable(R.styleable.IconListPreference_prefIcon);
 
-        int entryIconsResId = a.getResourceId(R.styleable.IconPreference_entryIcons, -1);
+        int entryIconsResId = a.getResourceId(R.styleable.IconListPreference_entryIcons, -1);
         if (entryIconsResId != -1) {
             setEntryIcons(entryIconsResId);
         }
@@ -67,7 +69,7 @@ public class IconListPreference extends ListPreference {
     public CharSequence getEntry() {
         if (selectedEntry != -1)
             return entries[selectedEntry];
-        return super.getEntry().toString();
+        return super.getEntry();
     }
 
     @Override
@@ -80,7 +82,7 @@ public class IconListPreference extends ListPreference {
     @Override
     public void onBindView(View view) {
         super.onBindView(view);
-        ImageView imageView = (ImageView) view.findViewById(R.id.icon);
+        ImageView imageView = (ImageView) view.findViewById(R.id.icon2);
         if (imageView != null && mIcon != null) {
             imageView.setImageDrawable(mIcon);
         }
