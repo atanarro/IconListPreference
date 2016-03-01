@@ -1,14 +1,12 @@
 package com.tanarro.iconlistpreference;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.preference.ListPreference;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,73 +32,96 @@ public class IconListPreference extends ListPreference {
     private CharSequence[] entries;
     private CharSequence[] entryValues;
     private int[] mEntryIcons = null;
-    private SharedPreferences prefs;
-    private SharedPreferences.Editor editor;
-    private String mKey;
-    private int selectedEntry = -1;
 
-    public IconListPreference(Context context, AttributeSet attrs) {
+    public IconListPreference(final Context context, final AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    @SuppressLint("CommitPrefEdits")
-    public IconListPreference(Context context, AttributeSet attrs, int defStyle) {
+    public IconListPreference(final Context context, final AttributeSet attrs, final int defStyle) {
         super(context, attrs);
-        setLayoutResource(R.layout.preference_icon);
+//        setLayoutResource(R.layout.preference_icon);
         mContext = context;
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.IconListPreference, defStyle, 0);
-        mIcon = a.getDrawable(R.styleable.IconListPreference_prefIcon);
+        setIcon(a.getDrawable(R.styleable.IconListPreference_prefIcon));
 
         int entryIconsResId = a.getResourceId(R.styleable.IconListPreference_entryIcons, -1);
         if (entryIconsResId != -1) {
             setEntryIcons(entryIconsResId);
         }
         mInflater = LayoutInflater.from(context);
-        mKey = getKey();
-        prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        editor = prefs.edit();
 
         a.recycle();
-
     }
 
     @Override
-    public CharSequence getEntry() {
-        if (selectedEntry != -1)
-            return entries[selectedEntry];
-        return super.getEntry();
-    }
-
-    @Override
-    public String getValue() {
-        if (selectedEntry != -1)
-            return entryValues[selectedEntry].toString();
-        return super.getValue();
-    }
-
-    @Override
-    public void onBindView(View view) {
-        super.onBindView(view);
-        ImageView imageView = (ImageView) view.findViewById(R.id.icon2);
-        if (imageView != null && mIcon != null) {
-            imageView.setImageDrawable(mIcon);
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        if (restorePersistedValue) {
+            final String persistedValue = getPersistedString((String)defaultValue);
+            setValue(persistedValue);
+        } else {
+            setValue((String)defaultValue);
+        }
+        final int index = getValueIndex();
+        if (index > -1) {
+            setValueIndex(index);
         }
     }
 
-    public void setIcon(Drawable icon) {
-        if ((icon == null && mIcon != null) || (icon != null && !icon.equals(mIcon))) {
-            mIcon = icon;
-            notifyChanged();
+    /**
+     * Sets the value to the given index from the entry values.
+     *
+     * @param index The index of the value to set.
+     */
+    @Override
+    public void setValueIndex(final int index) {
+        super.setValueIndex(index);
+        if (mEntryIcons != null) {
+            setIcon(mEntryIcons[index]);
+        }
+    }
+
+    private int getValueIndex() {
+        return findIndexOfValue(getValue());
+    }
+
+    @Override
+    public void onBindView(final View view) {
+        super.onBindView(view);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
+            if (imageView != null && mIcon != null) {
+                imageView.setImageDrawable(mIcon);
+            }
+        }
+    }
+
+//    @TargetApi(Build.VERSION_CODES.CUPCAKE)
+    public void setIcon(final Drawable icon) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            super.setIcon(icon);
+        } else {
+            if ((icon == null && mIcon != null) || (icon != null && !icon.equals(mIcon))) {
+                mIcon = icon;
+                notifyChanged();
+            }
         }
     }
 
     public Drawable getIcon() {
-        return mIcon;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            return super.getIcon();
+        } else {
+            return mIcon;
+        }
     }
 
     public void setEntryIcons(int[] entryIcons) {
         mEntryIcons = entryIcons;
+        final int index = getValueIndex();
+        if (index > -1) {
+            setValueIndex(index);
+        }
     }
 
     public void setEntryIcons(int entryIconsResId) {
@@ -131,15 +152,7 @@ public class IconListPreference extends ListPreference {
         iconListPreferenceAdapter = new IconListPreferenceScreenAdapter(mContext);
 
         if (mEntryIcons != null) {
-            String selectedValue = prefs.getString(mKey, "");
-            for (int i = 0; i < entryValues.length; i++) {
-                if (selectedValue.compareTo((String) entryValues[i]) == 0) {
-                    selectedEntry = i;
-                    break;
-                }
-            }
             builder.setAdapter(iconListPreferenceAdapter, null);
-
         }
     }
 
@@ -163,7 +176,7 @@ public class IconListPreference extends ListPreference {
                 rButton = (RadioButton) row.findViewById(R.id.image_list_view_row_radio_button);
                 rButton.setId(position);
                 rButton.setClickable(false);
-                rButton.setChecked(selectedEntry == position);
+                rButton.setChecked(getValueIndex() == position);
 
                 if (mEntryIcons != null) {
                     text.setText(" " + text.getText());
@@ -200,10 +213,7 @@ public class IconListPreference extends ListPreference {
                     mDialog.dismiss();
 
                     IconListPreference.this.callChangeListener(entryValues[p]);
-                    editor.putString(mKey, entryValues[p].toString());
-                    selectedEntry = p;
-                    editor.commit();
-
+                    setValueIndex(p);
                 }
             });
 
