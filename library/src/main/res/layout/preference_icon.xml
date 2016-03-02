@@ -8,8 +8,7 @@
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:gravity="center_vertical" 
     android:paddingRight="?android:attr/scrollbarSize"
-    tools:context=".IconListPreference"
-    >
+    tools:context=".IconListPreference">
     <ImageView
         android:id="@android:id/icon"
    		android:layout_width="wrap_content"

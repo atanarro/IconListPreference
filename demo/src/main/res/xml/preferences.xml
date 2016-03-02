@@ -25,13 +25,13 @@
         android:summary="IconListPreference by code"
         />
     
-        <com.tanarro.iconlistpreference.IconListPreference
+    <com.tanarro.iconlistpreference.IconListPreference
         android:title="Test4"
         android:key="test4"
         android:summary="IconListPreference with listener"
         />
         
-        <com.tanarro.iconlistpreference.IconListPreference
+    <com.tanarro.iconlistpreference.IconListPreference
         android:title="Test5"
         android:key="test5"
         android:entries="@array/android_versions"

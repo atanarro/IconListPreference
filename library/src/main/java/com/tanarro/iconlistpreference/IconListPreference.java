@@ -26,12 +26,12 @@ import android.widget.TextView;
 public class IconListPreference extends ListPreference {
 
     private Drawable mIcon;
-    private IconListPreferenceScreenAdapter iconListPreferenceAdapter = null;
+    private ImageView imageView; // only used if Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB
     private Context mContext;
     private LayoutInflater mInflater;
     private CharSequence[] entries;
     private CharSequence[] entryValues;
-    private int[] mEntryIcons = null;
+    private int[] mEntryIcons;
 
     public IconListPreference(final Context context, final AttributeSet attrs) {
         this(context, attrs, 0);
@@ -39,7 +39,9 @@ public class IconListPreference extends ListPreference {
 
     public IconListPreference(final Context context, final AttributeSet attrs, final int defStyle) {
         super(context, attrs);
-//        setLayoutResource(R.layout.preference_icon);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            setLayoutResource(R.layout.preference_icon);
+        }
         mContext = context;
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.IconListPreference, defStyle, 0);
@@ -56,12 +58,7 @@ public class IconListPreference extends ListPreference {
 
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-        if (restorePersistedValue) {
-            final String persistedValue = getPersistedString((String)defaultValue);
-            setValue(persistedValue);
-        } else {
-            setValue((String)defaultValue);
-        }
+        super.onSetInitialValue(restorePersistedValue, defaultValue);
         final int index = getValueIndex();
         if (index > -1) {
             setValueIndex(index);
@@ -89,10 +86,18 @@ public class IconListPreference extends ListPreference {
     public void onBindView(final View view) {
         super.onBindView(view);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
+            imageView = (ImageView)view.findViewById(android.R.id.icon);
             if (imageView != null && mIcon != null) {
                 imageView.setImageDrawable(mIcon);
             }
+        }
+    }
+
+    public void setIcon(final int iconResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            super.setIcon(iconResId);
+        } else {
+            setIcon(mContext.getResources().getDrawable(iconResId));
         }
     }
 
@@ -103,6 +108,9 @@ public class IconListPreference extends ListPreference {
         } else {
             if ((icon == null && mIcon != null) || (icon != null && !icon.equals(mIcon))) {
                 mIcon = icon;
+                if (imageView != null && mIcon != null) {
+                    imageView.setImageDrawable(mIcon);
+                }
                 notifyChanged();
             }
         }
@@ -149,40 +157,15 @@ public class IconListPreference extends ListPreference {
             throw new IllegalStateException("IconListPreference requires the icons entries array be the same length than entries or null");
         }
 
-        iconListPreferenceAdapter = new IconListPreferenceScreenAdapter(mContext);
-
         if (mEntryIcons != null) {
+            final IconListPreferenceScreenAdapter iconListPreferenceAdapter = new IconListPreferenceScreenAdapter();
             builder.setAdapter(iconListPreferenceAdapter, null);
         }
     }
 
     private class IconListPreferenceScreenAdapter extends BaseAdapter {
-        public IconListPreferenceScreenAdapter(Context context) {
-
-        }
-
         public int getCount() {
             return entries.length;
-        }
-
-        class CustomHolder {
-            private TextView text = null;
-            private RadioButton rButton = null;
-
-            CustomHolder(View row, int position) {
-                text = (TextView) row.findViewById(R.id.image_list_view_row_text_view);
-                text.setText(entries[position]);
-
-                rButton = (RadioButton) row.findViewById(R.id.image_list_view_row_radio_button);
-                rButton.setId(position);
-                rButton.setClickable(false);
-                rButton.setChecked(getValueIndex() == position);
-
-                if (mEntryIcons != null) {
-                    text.setText(" " + text.getText());
-                    text.setCompoundDrawablesWithIntrinsicBounds(mEntryIcons[position], 0, 0, 0);
-                }
-            }
         }
 
         public Object getItem(int position) {
@@ -193,31 +176,50 @@ public class IconListPreference extends ListPreference {
             return position;
         }
 
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View row = convertView;
-            CustomHolder holder = null;
-            final int p = position;
-            row = mInflater.inflate(R.layout.image_list_preference_row, parent, false);
-            holder = new CustomHolder(row, position);
+        class CustomHolder {
+            TextView text;
+            RadioButton rButton;
+        }
 
-            row.setTag(holder);
+        public View getView(int position, View convertView, ViewGroup parent) {
+            CustomHolder holder;
+            if (convertView == null) {
+                convertView = mInflater.inflate(R.layout.image_list_preference_row, parent, false);
+                holder = new CustomHolder();
+                holder.text = (TextView)convertView.findViewById(R.id.image_list_view_row_text_view);
+                holder.rButton = (RadioButton)convertView.findViewById(R.id.image_list_view_row_radio_button);
+                convertView.setTag(holder);
+            } else {
+                holder = (CustomHolder)convertView.getTag();
+            }
+
+            holder.text.setText(entries[position]);
+            if (mEntryIcons != null) {
+                holder.text.setText(" " + holder.text.getText());
+                holder.text.setCompoundDrawablesWithIntrinsicBounds(mEntryIcons[position], 0, 0, 0);
+            }
+
+            holder.rButton.setId(position);
+            holder.rButton.setClickable(false);
+            holder.rButton.setChecked(getValueIndex() == position);
 
             // row.setClickable(true);
             // row.setFocusable(true);
             // row.setFocusableInTouchMode(true);
-            row.setOnClickListener(new View.OnClickListener() {
+            final int p = position;
+            convertView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     v.requestFocus();
 
-                    Dialog mDialog = getDialog();
-                    mDialog.dismiss();
-
                     IconListPreference.this.callChangeListener(entryValues[p]);
                     setValueIndex(p);
+
+                    Dialog mDialog = getDialog();
+                    mDialog.dismiss();
                 }
             });
 
-            return row;
+            return convertView;
         }
 
     }
