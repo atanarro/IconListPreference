@@ -25,6 +25,7 @@ import android.widget.TextView;
  */
 public class IconListPreference extends ListPreference {
 
+    private boolean updateIcon;
     private Drawable mIcon;
     private ImageView imageView; // only used if Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB
     private Context mContext;
@@ -46,6 +47,7 @@ public class IconListPreference extends ListPreference {
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.IconListPreference, defStyle, 0);
         setIcon(a.getDrawable(R.styleable.IconListPreference_prefIcon));
+        updateIcon = a.getBoolean(R.styleable.IconListPreference_updateIcon, true);
 
         int entryIconsResId = a.getResourceId(R.styleable.IconListPreference_entryIcons, -1);
         if (entryIconsResId != -1) {
@@ -73,7 +75,7 @@ public class IconListPreference extends ListPreference {
     @Override
     public void setValueIndex(final int index) {
         super.setValueIndex(index);
-        if (mEntryIcons != null) {
+        if (mEntryIcons != null && updateIcon) {
             setIcon(mEntryIcons[index]);
         }
     }
@@ -87,7 +89,7 @@ public class IconListPreference extends ListPreference {
         super.onBindView(view);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             imageView = (ImageView)view.findViewById(android.R.id.icon);
-            if (imageView != null && mIcon != null) {
+            if (imageView != null && mIcon != null && updateIcon) {
                 imageView.setImageDrawable(mIcon);
             }
         }

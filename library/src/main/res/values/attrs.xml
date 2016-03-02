@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="IconListPreference">
         <attr name="prefIcon" format="reference" />
+        <attr name="updateIcon" format="boolean" />
         <attr name="entryIcons" format="reference" />
     </declare-styleable>
 </resources>

@@ -28,11 +28,22 @@
         android:title="Test4"
         android:key="test4"
         android:summary="IconListPreference with listener"
+        iconlistpreference:updateIcon="false"
         />
-        
+
     <com.tanarro.iconlistpreference.IconListPreference
-        android:title="Test5"
         android:key="test5"
+        android:title="Test5"
+        android:entries="@array/android_versions"
+        android:entryValues="@array/android_version_values"
+        android:summary="IconListPreference updateIcon=false"
+        iconlistpreference:updateIcon="false"
+        iconlistpreference:entryIcons="@array/android_version_icons"
+        />
+
+    <com.tanarro.iconlistpreference.IconListPreference
+        android:title="Test6"
+        android:key="test6"
         android:entries="@array/android_versions"
         android:entryValues="@array/android_version_values"
         android:summary="IconListPreference with no icons"
