@@ -19,16 +19,45 @@
         />
 
     <com.tanarro.iconlistpreference.IconListPreference
-        android:title="Test3"
-        android:key="test3"
-        android:summary="IconListPreference by code"
+        android:key="test2left"
+        android:title="Test2 Left"
+        android:entries="@array/android_versions"
+        android:entryValues="@array/android_version_values"
+        android:summary="IconListPreference by xml iconSide=left"
+        iconlistpreference:prefIcon="@drawable/ic_launcher"
+        iconlistpreference:iconSide="left"
+        iconlistpreference:entryIcons="@array/android_version_icons"
         />
-    
+
+    <com.tanarro.iconlistpreference.IconListPreference
+        android:key="test2right"
+        android:title="Test2 Right"
+        android:entries="@array/android_versions"
+        android:entryValues="@array/android_version_values"
+        android:summary="IconListPreference by xml iconSide=right"
+        iconlistpreference:prefIcon="@drawable/ic_launcher"
+        iconlistpreference:iconSide="right"
+        iconlistpreference:entryIcons="@array/android_version_icons"
+        />
+
+    <com.tanarro.iconlistpreference.IconListPreference
+        android:title="Test3 start"
+        android:key="test3t"
+        android:summary="IconListPreference by code updateIcon=true, iconSide=start"
+        />
+
+    <com.tanarro.iconlistpreference.IconListPreference
+        android:title="Test3 end"
+        android:key="test3f"
+        android:summary="IconListPreference by code updateIcon=false, iconSide=end"
+        />
+
     <com.tanarro.iconlistpreference.IconListPreference
         android:title="Test4"
         android:key="test4"
-        android:summary="IconListPreference with listener"
+        android:summary="IconListPreference with listener updateIcon=false, iconSide=end"
         iconlistpreference:updateIcon="false"
+        iconlistpreference:iconSide="end"
         />
 
     <com.tanarro.iconlistpreference.IconListPreference
